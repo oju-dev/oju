@@ -1,8 +1,8 @@
 package tracer
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"oju/internal/utils"
 )
@@ -16,6 +16,7 @@ type Trace struct {
 	children   map[string]*Trace
 }
 
+// TODO: set app_key as a parameter here
 func Parse(packet string) (Trace, error) {
 	var tracer Trace
 	unmarshal_error := json.Unmarshal([]byte(packet), &tracer)

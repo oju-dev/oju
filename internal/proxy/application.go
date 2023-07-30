@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"errors"
 	"oju/internal/parser"
 	"oju/internal/tracer"
 )
@@ -41,11 +40,11 @@ func (application *Application) HandleMessage(destination string, message Applic
 		trace.SetAppKey(destination)
 
 		if parse_trace_error != nil {
-			application.errors = append(application.errors, errors.New(parse_trace_error.Error()))
+			application.errors = append(application.errors, parse_trace_error)
 			break
 		}
 
-	application.traces[trace.GetId()] = &trace
+		application.traces[trace.GetId()] = &trace
 
 		stack_trace.RunStack(&trace, applications_metadata)
 	}

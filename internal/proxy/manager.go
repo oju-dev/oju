@@ -38,6 +38,7 @@ func (manager *Manager) Redirect(destination string, payload ApplicationMessage)
 		metadata := app.GetMetadata()
 		if metadata.Host == destination || metadata.Key == destination {
 			app.HandleMessage(destination, payload, manager.StackTrace, manager.GetMetadatas())
+			return
 		}
 	}
 }
