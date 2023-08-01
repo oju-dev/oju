@@ -34,7 +34,7 @@ func (request *Request) String() string {
 	return fmt.Sprintf("%v\n%v\n%v", request.Header.String(), request.Timer, request.Message)
 }
 
-func NewRequest(head, message string, allowed_applications []config.Application) (Request, error) {
+func NewRequest(head, message string, allowed_applications []config.Service) (Request, error) {
 	parts := strings.Split(head, " ")
 	if len(parts) != 3 {
 		return Request{}, errors.New(ERROR_MALFORMED_HEADER)
@@ -62,7 +62,7 @@ func NewRequest(head, message string, allowed_applications []config.Application)
 	}, nil
 }
 
-func Parse(packet string, allowed_applications []config.Application) (Request, error) {
+func Parse(packet string, allowed_applications []config.Service) (Request, error) {
 	parts := strings.Split(packet, "\n")
 	if len(parts) != 2 {
 		return Request{}, errors.New(ERROR_MALFORMED_PACKET)
@@ -93,7 +93,7 @@ func is_verb_allowed(verb string) bool {
 	return false
 }
 
-func is_application_allowed(app_key string, allowed_applications []config.Application) bool {
+func is_application_allowed(app_key string, allowed_applications []config.Service) bool {
 
 	for _, application := range allowed_applications {
 		if application.AppKey == app_key {

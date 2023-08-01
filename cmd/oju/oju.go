@@ -6,10 +6,10 @@ import (
 	"io"
 	"log"
 	"net"
+	"oju/internal/commander"
 	"oju/internal/config"
 	"oju/internal/proxy"
 	"oju/internal/requester"
-	"oju/internal/commander"
 	"os"
 )
 
@@ -27,7 +27,7 @@ func main() {
 		log.Fatalln(load_config_error.Error())
 	}
 
-	manager := proxy.NewManager(config.AllowedApplications)
+	manager := proxy.NewManager(config.AllowedServices)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
@@ -72,7 +72,7 @@ func handle_incoming_message(socket net.Conn, config config.Config, manager *pro
 			break
 		}
 
-		request, request_error := requester.Parse(string(message), config.AllowedApplications)
+		request, request_error := requester.Parse(string(message), config.AllowedServices)
 		if request_error != nil {
 			log.Println("Error on parsing request: ", request_error.Error())
 			break
@@ -80,13 +80,13 @@ func handle_incoming_message(socket net.Conn, config config.Config, manager *pro
 
 		switch request.Header.Verb {
 		case "LOG":
-			manager.Redirect(request.Header.AppKey, proxy.ApplicationMessage{
+			manager.Redirect(request.Header.AppKey, proxy.Payload{
 				Type:    "LOG",
 				Payload: request.Message,
 			})
 			break
 		case "TRACE":
-			manager.Redirect(request.Header.AppKey, proxy.ApplicationMessage{
+			manager.Redirect(request.Header.AppKey, proxy.Payload{
 				Type:    "TRACE",
 				Payload: request.Message,
 			})

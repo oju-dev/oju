@@ -6,45 +6,46 @@ import (
 	"oju/internal/tracer"
 )
 
-const ACTION_GET_TRACES = "GET_TRACES"
-
 type Manager struct {
-	Applications []*Application
-	StackTrace   *StackTrace
-	Mailbox      chan Message
+	Services   []*Service
+	StackTrace *StackTrace
+	Links      []Link
+	Mailbox    chan Message
 }
 
 type Message struct {
 	Destination string
-	Payload     ApplicationMessage
+	Payload     Payload
 }
 
-func NewManager(allowed_applications []config.Application) *Manager {
+func NewManager(allowed_applications []config.Service) *Manager {
 	manager := &Manager{
-		Applications: make([]*Application, 0),
-		StackTrace:   NewStackTrace(),
-		Mailbox:      make(chan Message),
+		Services:   make([]*Service, 0),
+		StackTrace: NewStackTrace(),
+		Links:      make([]Link, 0),
+		Mailbox:    make(chan Message),
 	}
 
 	for _, allowed := range allowed_applications {
-		manager.Applications = append(manager.Applications, get_app(allowed))
+		manager.Services = append(manager.Services, get_app(allowed))
 	}
 
 	return manager
 }
 
-func (manager *Manager) Redirect(destination string, payload ApplicationMessage) {
-	for _, app := range manager.Applications {
-		metadata := app.GetMetadata()
+func (manager *Manager) Redirect(destination string, payload Payload) {
+	for _, service := range manager.Services {
+		metadata := service.GetMetadata()
 		if metadata.Host == destination || metadata.Key == destination {
-			app.HandleMessage(destination, payload, manager.StackTrace, manager.GetMetadatas())
+			// TODO: apply switch here
+			manager.Links = service.HandleTrace(destination, payload, manager.Links, manager.GetMetadatas())
 			return
 		}
 	}
 }
 
 func (manager *Manager) GetAppTraces(destination string) map[string]*tracer.Trace {
-	for _, app := range manager.Applications {
+	for _, app := range manager.Services {
 		metadata := app.GetMetadata()
 		if metadata.Host == destination || metadata.Key == destination {
 			return app.traces
@@ -55,15 +56,15 @@ func (manager *Manager) GetAppTraces(destination string) map[string]*tracer.Trac
 
 func (manager *Manager) GetMetadatas() []Metadata {
 	var metadatas []Metadata
-	for _, app := range manager.Applications {
+	for _, app := range manager.Services {
 		metadatas = append(metadatas, app.GetMetadata())
 	}
 
 	return metadatas
 }
 
-func get_app(config_app config.Application) *Application {
-	return &Application{
+func get_app(config_app config.Service) *Service {
+	return &Service{
 		parse_tree: parser.NewTree(10),
 		traces:     make(map[string]*tracer.Trace),
 		metadata: Metadata{

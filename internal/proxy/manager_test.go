@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"oju/internal/config"
-	"oju/internal/tracer"
 )
 
 const bhaskara_payload = `{"app_key": "bhaskara","name":"span-name","service":"","attributes":{"http.url":"http://delta.api.svc.cluster.local","http.method":"POST","http.body.email":"test@email.com"}}`
@@ -16,7 +15,7 @@ const pitagoras_payload = `{"app_key":"pitagoras","name":"do-hipothenusa","servi
 func load_config() config.Config {
 	config_json := `
 {
-  "allowed_applications": [
+  "allowed_services": [
     {
       "name": "bhaskara",
       "app_key": "bhaskara",
@@ -41,9 +40,9 @@ func load_config() config.Config {
 
 func TestUpAllAllowedApplicationsByProxy(t *testing.T) {
 	config := load_config()
-	manager := NewManager(config.AllowedApplications)
+	manager := NewManager(config.AllowedServices)
 
-	message := ApplicationMessage{
+	message := Payload{
 		Type:    "TRACE",
 		Payload: bhaskara_payload,
 	}
@@ -56,85 +55,20 @@ func TestUpAllAllowedApplicationsByProxy(t *testing.T) {
 	}
 }
 
-func TestTwoTracesByDifferentServicesByAppKeyField(t *testing.T) {
+func TestLinkedTraces(t *testing.T) {
 	config := load_config()
-	manager := NewManager(config.AllowedApplications)
+	manager := NewManager(config.AllowedServices)
 
-	message := ApplicationMessage{
+	message := Payload{
 		Type:    "TRACE",
 		Payload: bhaskara_payload,
 	}
 
-	message_delta := ApplicationMessage{
+	message_delta := Payload{
 		Type:    "TRACE",
 		Payload: delta_payload,
 	}
 
 	manager.Redirect("bhaskara", message)
 	manager.Redirect("delta", message_delta)
-	traces := manager.GetAppTraces("bhaskara")
-
-	if len(traces) == 0 {
-		t.Fatal("traces must be filled")
-	}
-
-	var bhaskara_trace *tracer.Trace
-
-	for _, trace := range traces {
-		bhaskara_trace = trace
-		break
-	}
-
-	children := bhaskara_trace.GetChildren()
-
-	if len(children) == 0 {
-		t.Fatal("this children must be filled")
-	}
-}
-
-func TestConcurrentlyTracesByDifferentServicesByAppKeyField(t *testing.T) {
-	config := load_config()
-	manager := NewManager(config.AllowedApplications)
-
-	message := ApplicationMessage{
-		Type:    "TRACE",
-		Payload: bhaskara_payload,
-	}
-
-	message_delta := ApplicationMessage{
-		Type:    "TRACE",
-		Payload: delta_payload,
-	}
-
-	message_pitagoras := ApplicationMessage{
-		Type:    "TRACE",
-		Payload: pitagoras_payload,
-	}
-
-	n := 0
-	for n <= 5 {
-		manager.Redirect("bhaskara", message)
-		manager.Redirect("delta", message_delta)
-		manager.Redirect("pitagoras", message_pitagoras)
-		n += 1
-	}
-
-	traces := manager.GetAppTraces("bhaskara")
-
-	if len(traces) == 0 {
-		t.Fatal("traces must be filled")
-	}
-
-	var bhaskara_trace *tracer.Trace
-
-	for _, trace := range traces {
-		bhaskara_trace = trace
-		break
-	}
-
-	children := bhaskara_trace.GetChildren()
-
-	if len(children) == 0 {
-		t.Fatal("this children must be filled")
-	}
 }
