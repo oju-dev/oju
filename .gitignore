@@ -13,3 +13,6 @@ config.json
 
 dist/
 .tool-versions
+
+.stack-work
+dist-newstyle

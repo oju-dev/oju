@@ -1,6 +1,5 @@
-module Main (main) where
-
-import Lib
+module Main where
 
 main :: IO ()
-main = someFunc
+main = do
+  putStrLn "Hello, Haskell!"

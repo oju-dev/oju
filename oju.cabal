@@ -1,67 +1,67 @@
-cabal-version: 2.2
+cabal-version:      3.4
+name:               oju
+version:            0.0.1
+synopsis:           A stream tracing server for distributed applications
+-- description:
+homepage:           https://github.com/oju-dev/oju
+license:            MIT
+license-file:       LICENSE
+author:             OJU DEV
+maintainer:         contactoju@gmail.com
+-- copyright:
+category:           Network
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
---
--- see: https://github.com/sol/hpack
+common warnings
+    ghc-options: -Wall
 
-name:           oju
-version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/oju#readme>
-homepage:       https://github.com/githubuser/oju#readme
-bug-reports:    https://github.com/githubuser/oju/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2023 Author name here
-license:        BSD-3-Clause
-license-file:   LICENSE
-build-type:     Simple
-extra-source-files:
-    README.md
-    CHANGELOG.md
+common default-extensions
+        default-extensions:
+                OverloadedStrings,
+                BangPatterns,
+                NumericUnderscores,
+                DeriveGeneric,
+                DeriveAnyClass
 
-source-repository head
-  type: git
-  location: https://github.com/githubuser/oju
 
 library
-  exposed-modules:
-      Lib
-  other-modules:
-      Paths_oju
-  autogen-modules:
-      Paths_oju
-  hs-source-dirs:
-      src
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
-  build-depends:
-      base >=4.7 && <5
-  default-language: Haskell2010
+    import:           warnings, default-extensions
+    exposed-modules:  Config
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.19.0.0,
+        aeson,
+        aeson-casing,
+        text,
+        bytestring
+    hs-source-dirs:   src
+    default-language: Haskell2010
 
-executable oju-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_oju
-  autogen-modules:
-      Paths_oju
-  hs-source-dirs:
-      app
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , oju
-  default-language: Haskell2010
+executable oju
+    import:           warnings, default-extensions
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.19.0.0,
+        oju
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
 
 test-suite oju-test
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      Paths_oju
-  autogen-modules:
-      Paths_oju
-  hs-source-dirs:
-      test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      base >=4.7 && <5
-    , oju
-  default-language: Haskell2010
+    import:           warnings, default-extensions
+    default-language: Haskell2010
+    other-modules:
+      ConfigTest
+    -- other-extensions:
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    build-depends:
+        base ^>=4.19.0.0,
+        oju,
+        HUnit

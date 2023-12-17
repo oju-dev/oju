@@ -1,0 +1,14 @@
+{
+  "allowed_applications": [
+    {
+      "name": "bhaskara",
+      "key": "bhaskara-key",
+      "host": "bhaskara-host"
+    },
+    {
+      "name": "delta",
+      "key": "delta-key",
+      "host": "delta-host"
+    }
+  ]
+}
