@@ -13,3 +13,10 @@ config.json
 
 dist/
 .tool-versions
+
+
+# Added by cargo
+#
+# already existing elements were commented out
+
+#/target
