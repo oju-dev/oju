@@ -1,20 +1,38 @@
 name: building and testing
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Go
-        uses: actions/setup-go@v4
+      - uses: actions/setup-haskell@v1
         with:
-          go-version: 1.20.2
-      - name: Install deps
+          ghc-version: '9.8.1'
+          cabal-version: '3.10'
+
+      - name: cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-cabal
+        with:
+          path: ~/.cabal
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: install dependencies
         run: |
-          go mod download
-      - name: Build
-        run: go build  cmd/...
-      - name: Test
-        run: go test -v ./...
-      
+          cabal update
+          cabal build --only-dependencies --enable-tests --enable-benchmarks
+
+      - name: build
+        run: cabal build --enable-tests --enable-benchmarks all
+
+      - name: run tests
+        run: cabal test all
