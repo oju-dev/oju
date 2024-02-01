@@ -28,7 +28,9 @@ common default-extensions
 
 library
     import:           warnings, default-extensions
-    exposed-modules:  Config, Requester
+    exposed-modules:
+      Config,
+      Requester.Request
     -- other-modules:
     -- other-extensions:
     build-depends:
@@ -37,8 +39,6 @@ library
         aeson-casing,
         text,
         bytestring,
-        serialise,
-        cborg,
         containers
     hs-source-dirs:   src
     default-language: Haskell2010
